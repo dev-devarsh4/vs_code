@@ -1,0 +1,54 @@
+{
+    "editor.fontFamily": "'cascadia code',Consolas, 'Courier New', monospace",
+    "bracket-pair-colorizer-2.depreciation-notice": false,
+    "files.autoSave": "afterDelay",
+    "editor.fontSize": 20,
+    "dart.previewFlutterUiGuides": true,
+    "workbench.iconTheme": "material-icon-theme",
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "editor.defaultFormatter": "Dart-Code.flutter",
+    "dart.previewHotReloadOnSaveWatcher": true,
+    "dart.flutterHotRestartOnSave": false,
+    "dart.hotReloadOnSave": "always",
+    "workbench.list.multiSelectModifier": "alt",
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "explorer.confirmDelete": false,
+    "[dart]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnType": true,
+        "editor.selectionHighlight": false,
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        "editor.suggestSelection": "first",
+        "editor.tabCompletion": "onlySnippets",
+        "editor.wordBasedSuggestions": false,
+        "editor.defaultFormatter": "Dart-Code.dart-code"
+    },
+    "editor.formatOnSave": true,
+    "workbench.sideBar.location": "right",
+    "update.enableWindowsBackgroundUpdates": false,
+    "update.mode": "manual",
+    "dart.previewFlutterUiGuidesCustomTracking": true,
+    "workbench.editorAssociations": {
+        "*.svg": "default"
+    },
+    "security.workspace.trust.untrustedFiles": "open",
+    "editor.multiCursorModifier": "ctrlCmd",
+    "explorer.confirmDragAndDrop": false,
+    "workbench.startupEditor": "none",
+    "git.enableSmartCommit": true,
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx1G -Xms100m -javaagent:\"c:\\Users\\devar\\.vscode\\extensions\\gabrielbb.vscode-lombok-1.0.1\\server\\lombok.jar\"",
+    "redhat.telemetry.enabled": false,
+    "java.configuration.runtimes": [
+    
+    ],
+    "[java]": {
+        "editor.defaultFormatter": "redhat.java"
+    },
+    "window.zoomLevel": -1,
+    "editor.inlineSuggest.enabled": true
+    
+}
