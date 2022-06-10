@@ -1,6 +1,7 @@
 {
     "editor.fontFamily": "'cascadia code',Consolas, 'Courier New', monospace",
     "bracket-pair-colorizer-2.depreciation-notice": false,
+    "editor.guides.bracketPairs":"active",
     "files.autoSave": "afterDelay",
     "editor.fontSize": 20,
     "dart.previewFlutterUiGuides": true,
@@ -42,12 +43,6 @@
     "git.confirmSync": false,
     "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx1G -Xms100m -javaagent:\"c:\\Users\\devar\\.vscode\\extensions\\gabrielbb.vscode-lombok-1.0.1\\server\\lombok.jar\"",
     "redhat.telemetry.enabled": false,
-    "java.configuration.runtimes": [
-    
-    ],
-    "[java]": {
-        "editor.defaultFormatter": "redhat.java"
-    },
     "window.zoomLevel": -1,
     "editor.inlineSuggest.enabled": true
     
