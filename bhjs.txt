@@ -1,0 +1,424 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:simpos_ai_app/controller/cubit/sample_api_cubit.dart';
+import 'package:simpos_ai_app/controller/keyboard_cubit/keyboard_cubit_cubit.dart';
+import 'package:simpos_ai_app/utils/screen_util/screen_util.dart';
+
+class SampleChatScreen extends StatefulWidget {
+  const SampleChatScreen({super.key});
+
+  @override
+  State<SampleChatScreen> createState() => _SampleChatScreenState();
+}
+
+class _SampleChatScreenState extends State<SampleChatScreen> {
+  TextEditingController chatData = TextEditingController();
+  List<ChatList> chatListData = [];
+  String question = '';
+  ScrollController scrollController = ScrollController();
+  bool typing = false;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Chat Space')),
+      body: BlocListener<SampleApiCubit, SampleApiState>(
+        listener: (context, state) {
+          if (state is ChatLoading) {
+            FocusManager.instance.primaryFocus?.unfocus();
+            question = chatData.text.trim();
+            chatData.clear();
+          }
+          if (state is ChatDataSuccess) {
+            if (typing) {
+              typing = false;
+              setState(() {});
+            }
+          }
+        },
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.79,
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    children: [
+                      BlocBuilder<SampleApiCubit, SampleApiState>(
+                        builder: (context, state) {
+                          // typing = false;
+                          if (state is ChatDataSuccess) {
+                            typing = false;
+                            chatListData.add(ChatList(
+                                question: question, answer: state.data));
+                            scrollController.animateTo(
+                                scrollController.position.maxScrollExtent +
+                                    400.h,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut);
+                            return QuestionAnswer(
+                              chatListData: chatListData,
+                            );
+                          } else {
+                            if (chatListData.isNotEmpty) {
+                              return QuestionAnswer(chatListData: chatListData);
+                            } else {
+                              return const SizedBox();
+                            }
+                          }
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      BlocBuilder<SampleApiCubit, SampleApiState>(
+                          builder: (context, state) {
+                        if (state is ChatLoading) {
+                          typing = true;
+                          scrollController.animateTo(
+                              scrollController.position.maxScrollExtent + 400.h,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeInOut);
+                          return Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Flexible(
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                          top: 20.h, left: 50.w),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        border: Border.all(
+                                          color: const Color(0xFF52AD62),
+                                          width: 1.3.sp,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(20.r),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              5.w, 5.h, 5.w, 5.h),
+                                          child: Text(
+                                            question,
+                                            softWrap: true,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  CircleAvatar(
+                                    backgroundColor: Colors.transparent,
+                                    child: Image.asset(
+                                      'assets/images/perosn.jpg',
+                                      height: 20.h,
+                                      width: 20.w,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: Colors.transparent,
+                                    child: Image.asset(
+                                      'assets/images/simpos_png.png',
+                                      height: 30.h,
+                                      width: 30.w,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15),
+                                  const Text('Typing...'),
+                                ],
+                              ),
+                            ],
+                          );
+                        } else {
+                          return const SizedBox();
+                        }
+                      }),
+                      BlocBuilder<KeyboardCubit, KeyboardCubitState>(
+                          builder: (context, state) {
+                        if (state is KeyboardUp) {
+                          scrollController.animateTo(
+                              scrollController.position.maxScrollExtent + 400.h,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeInOut);
+                          return SizedBox(
+                            height: state.upHeight + 80.h,
+                          );
+                        } else {
+                          return const SizedBox();
+                        }
+                      })
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            BlocBuilder<KeyboardCubit, KeyboardCubitState>(
+                builder: (context, state) {
+              if (state is KeyboardUp) {
+                scrollController.animateTo(
+                    scrollController.position.maxScrollExtent + 400.h,
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeInOut);
+                return Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                        10.w, 30.h, 5.w, (state.upHeight + 12.sh)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(left: 10.w),
+                          width: 310.w,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            border: Border.all(
+                              color: const Color(0xFF52AD62),
+                              width: 1.3.sp,
+                            ),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: TextFormField(
+                            controller: chatData,
+                            decoration: const InputDecoration(
+                              iconColor: Color(0xFF52AD62),
+                              hintText: 'Type here..',
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        typing
+                            ? SizedBox(
+                                height: 25,
+                                width: 25,
+                                child: CircularProgressIndicator(),
+                              )
+                            : IconButton(
+                                onPressed: () async {
+                                  if (chatData.text.trim().isNotEmpty) {
+                                    await BlocProvider.of<SampleApiCubit>(
+                                            context)
+                                        .getChatData(chatData.text.trim());
+                                  } else {
+                                    showToast('Question is empty');
+                                  }
+                                },
+                                icon: const Icon(Icons.send))
+                      ],
+                    ),
+                  ),
+                );
+              } else {
+                return Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(10.w, 20.h, 5.w, 20.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(left: 10.w),
+                          width: 310.w,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            border: Border.all(
+                              color: const Color(0xFF52AD62),
+                              width: 1.3.sp,
+                            ),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: TextFormField(
+                            controller: chatData,
+                            decoration: const InputDecoration(
+                              iconColor: Color(0xFF52AD62),
+                              hintText: 'Type here..',
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        BlocBuilder<SampleApiCubit, SampleApiState>(
+                            builder: (context, state) {
+                          if (state is ChatDataSuccess) {
+                            return IconButton(
+                                onPressed: () async {
+                                  if (chatData.text.trim().isNotEmpty) {
+                                    await BlocProvider.of<SampleApiCubit>(
+                                            context)
+                                        .getChatData(chatData.text.trim());
+                                  }
+                                },
+                                icon: const Icon(Icons.send));
+                          }
+                          if (state is ChatLoading) {
+                            return SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: CircularProgressIndicator(),
+                            );
+                          } else {
+                            return IconButton(
+                                onPressed: () async {
+                                  if (chatData.text.trim().isNotEmpty) {
+                                    await BlocProvider.of<SampleApiCubit>(
+                                            context)
+                                        .getChatData(chatData.text.trim());
+                                  }
+                                },
+                                icon: const Icon(Icons.send));
+                          }
+                        })
+                      ],
+                    ),
+                  ),
+                );
+              }
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    chatData.dispose();
+    super.dispose();
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+}
+
+class QuestionAnswer extends StatefulWidget {
+  final List<ChatList> chatListData;
+  const QuestionAnswer({
+    Key? key,
+    required this.chatListData,
+  }) : super(key: key);
+  @override
+  State<QuestionAnswer> createState() => _QuestionAnswerState();
+}
+
+class _QuestionAnswerState extends State<QuestionAnswer> {
+  @override
+  Widget build(BuildContext context) {
+    return FractionallySizedBox(
+      child: Column(
+        children: List.generate(widget.chatListData.length, (i) {
+          return Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Flexible(
+                    child: Container(
+                      margin: EdgeInsets.only(top: 20.h, left: 50.w),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        border: Border.all(
+                          color: const Color(0xFF52AD62),
+                          width: 1.3.sp,
+                        ),
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(5.w, 5.h, 5.w, 5.h),
+                          child: SelectableText(
+                            utf8
+                                .decode(
+                                    widget.chatListData[i].question.codeUnits)
+                                .trim(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    child: Image.asset(
+                      'assets/images/perosn.jpg',
+                      height: 20.h,
+                      width: 20.w,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    child: Image.asset(
+                      'assets/images/simpos_png.png',
+                      height: 30.h,
+                      width: 30.w,
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 20.h),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      border: widget.chatListData[i].answer != null
+                          ? Border.all(
+                              color: const Color(0xFF52AD62),
+                              width: 1.3.sp,
+                            )
+                          : null,
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    width: 310.w,
+                    child: SingleChildScrollView(
+                        child: Padding(
+                            padding: EdgeInsets.all(8.0.r),
+                            child: widget.chatListData[i].answer != null
+                                ? SelectableText(utf8
+                                    .decode(widget
+                                        .chatListData[i].answer!.codeUnits)
+                                    .trim())
+                                : const SizedBox())),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              )
+            ],
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class ChatList {
+  final String question;
+  final String? answer;
+
+  ChatList({required this.question, required this.answer});
+}
